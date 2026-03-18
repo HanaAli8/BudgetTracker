@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Tracker</title>
+  <link rel="stylesheet" href="style.css"><!--//connect to css-->
+</head>
+<body>
+  
+
+<div id="app-container" style="display:flex; height:100vh;"><!-- dashboard with pages buttons-->
+
+  <!-- SIDEBAR -->
+  <div id="sidebar" style="
+      width:240px;
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      color:white;
+      padding:24px 16px;
+      display:flex;
+      flex-direction:column; 
+      gap:12px;
+      box-shadow: 4px 0 12px rgba(4,120,87,0.15);
+      border-right: 1px solid rgba(16,185,129,0.1);
+      margin: 0;
+  ">
+    <h2 style="margin: 0 0 16px 0; font-size: 1.3rem; color: #ecfdf5; text-align: center;">Dashboard</h2>
+
+    <button class="nav-btn" data-page="budget-page">Budget Tracker</button>
+    <button class="nav-btn" data-page="converter-page">Converter</button>
+    <button class="nav-btn" data-page="report-page">Report</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+   <!--take remaining space-->
+  <div id="main-content" style="
+      flex:1; 
+      padding:25px;
+      overflow-y:auto;
+  ">
+
+    <!-- PAGE 1 -->
+    <div id="budget-page">
+      <h1>My Budget Tracker</h1><!--//header name-->
+
+  
+  
+
+  <form id="expense-form"><!--//tracks a bunch of user inputs-->
+  <input type="text" id="expense-name" placeholder="Expense name" required> <!--//input for the name -->
+  <input type="number" id="expense-amount" placeholder="Amount" required><!--//input for amount-->
+  <select id="expense-category"></select> <!-- //select bcz its like a spinner-->
+  <input type="date" id="expense-date" required> <!-- //input for date-->
+    
+
+  <button type="submit">Add Expense</button><!-- //to submit-->
+</form>
+
+<ul id="expense-list"></ul>  <!--//list to keep track of expenses, ul because its unlisted we add li manually-->
+<input 
+  type="text" 
+  id="new-category-name" 
+  placeholder="Add new category"
+>
+
+
+<input type="number" id="category-limit" placeholder="Limit"><!-- //input for limit-->
+<input type="number" id="category-goal" placeholder="Goal (optional)"><!-- //input for goal-->
+<button type="button" id="add-category-btn">
+  Add Category
+</button><!-- //button to add new category-->
+<!-- Update Category Section -->
+<div id="update-category-section" style="margin-top: 20px; padding: 14px; background: #ffffff; border-radius: 14px; box-shadow: 0 8px 30px rgba(4,120,87,0.06); border: 1px solid rgba(4,120,87,0.04);">
+  <h3 style="margin-top: 0; color: var(--green-700);">Update Category Limit/Goal</h3>
+  <select id="category-to-update"></select>
+  <input type="number" id="update-category-limit" placeholder="New limit" step="0.01">
+  <input type="number" id="update-category-goal" placeholder="New goal" step="0.01">
+  <button type="button" id="update-category-btn">Update Category</button>
+</div>
+
+<p>Total: <span id="total">0</span></p> <!--  //total is span bcz it changes-->
+
+<h3>Monthly Spending Breakdown </h3>
+<div id="monthly-totals"></div>
+
+<h3>Category Totals</h3>
+<ul id="category-totals"></ul><!--to get the spend of each category and the percentages-->
+
+<div id="notification-container"
+     style="position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;">
+</div>
+
+
+    </div>
+
+    <!-- PAGE 2 -->
+      <div id="converter-page" style="display:none;">
+      <!-- CURRENCY CONVERTER WILL GO HERE -->
+      <h1>Currency Converter</h1>
+      <p class="muted" style="text-align:center; margin-top:-8px; margin-bottom:12px;">Quickly convert amounts between USD and LBP.</p>
+      <div id="converter-container" class="card"><!--container for the converter-->
+            <div id="rate-box"><!--shows live dollar rate-->
+            <p>Current USD Rate:</p>
+             <h3 id="usd-rate">Loading...</h3>
+            </div>
+
+          <div id="converter-box"><!--two inputs and buttons to convert between USD and LBP-->
+             <input type="number" id="usd-input" placeholder="USD">
+                <button id="usd-to-lbp">Convert to LBP</button>
+
+             <input type="number" id="lbp-input" placeholder="LBP">
+             <button id="lbp-to-usd">Convert to USD</button>
+            </div>
+
+      </div>
+    </div>
+
+    <!-- PAGE 3 -->
+    <div id="report-page" style="display:none;">
+      <div class="pdf-container">
+      <h1>Expense Report</h1>
+      
+      <div class="no-print" style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center; background: #ffffff; padding: 14px; border-radius: 14px; box-shadow: 0 8px 30px rgba(4,120,87,0.06); border: 1px solid rgba(4,120,87,0.04);">
+        <label for="report-month-selector" style="font-weight: 600; color: var(--green-700);">Select Month:</label>
+        <input type="month" id="report-month-selector" style="padding: 10px 12px; border: 1px solid rgba(15,23,42,0.06); border-radius: 10px; outline: none; cursor: pointer;">
+      </div>
+      
+      <p id="reportMonth"></p>
+      <p id="totalSpent"></p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="reportTableBody"></tbody>
+      </table>
+
+      <div id="category-breakdown"></div>
+
+      <button class="no-print" onclick="generatePDF()" style="margin-top: 20px; padding: 10px 16px; background: linear-gradient(90deg, #34d399 0%, #059669 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 8px 18px rgba(5,150,105,0.14);">Download PDF</button>
+    </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script src="script.js"></script><!--//connect to java immediatly -->
+</body>
+</html>
